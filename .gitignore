@@ -1,2 +1,57 @@
-zetaclub/backend/uploads/ 
-zetaclub/backend/uploads/ 
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
+dist/
+build/
+.next/
+out/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+logs/
+
+# SQLite Database
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-journal
+
+# Uploads and Media
+uploads/
+**/uploads/
+public/uploads/
+storage/
+temp/
+
+# Video Files
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
