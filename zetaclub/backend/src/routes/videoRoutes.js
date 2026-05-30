@@ -14,6 +14,15 @@ router.get("/admin/stats", authMiddleware, videoController.getAdminStats);
 router.get("/", videoController.getAllVideos);
 router.get("/:id/related", videoController.getRelatedVideos);
 router.post("/:id/view", videoController.registerView);
+// Public routes
+router.get("/", videoController.getAllVideos);
+router.get("/:id/related", videoController.getRelatedVideos);
+router.post("/:id/view", videoController.registerView);
+
+router.post("/:id/like", videoController.likeVideo);
+router.post("/:id/dislike", videoController.dislikeVideo);
+
+router.get("/:id", videoController.getVideoById);
 router.get("/:id", videoController.getVideoById);
 
 // Protected video routes

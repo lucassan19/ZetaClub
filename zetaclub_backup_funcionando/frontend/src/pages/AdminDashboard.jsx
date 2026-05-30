@@ -180,7 +180,7 @@ const AdminDashboard = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h1 className="text-4xl font-black text-white tracking-tight flex items-center gap-3">
-            Controle do <span className="text-primary-500">ZetaClub</span>
+            Controle do <span className="text-primary-500">67videos</span>
           </h1>
           <p className="text-slate-400 font-medium mt-1">Visão geral do sistema e gerenciamento de conteúdo.</p>
         </div>

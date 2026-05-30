@@ -84,8 +84,8 @@ app.use((err, req, res, next) => {
 });
 
 // Database Sync & Start Server
-sequelize.sync().then(() => {
-  console.log('Database synced successfully');
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synced successfully with alter: true');
   
   const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -62,10 +62,37 @@ module.exports = (sequelize) => {
         defaultValue: 0,
       },
 
+      likes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      dislikes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      // 👍 Likes
+      likes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      // 👎 Dislikes
+      dislikes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
       qualities: {
         type: DataTypes.TEXT,
         allowNull: false,
         defaultValue: "[]",
+
         get() {
           const value = this.getDataValue("qualities");
 
@@ -75,6 +102,7 @@ module.exports = (sequelize) => {
             return [];
           }
         },
+
         set(value) {
           if (Array.isArray(value)) {
             this.setDataValue("qualities", JSON.stringify(value));
@@ -86,11 +114,13 @@ module.exports = (sequelize) => {
     },
     {
       tableName: "Videos",
+
       indexes: [
         { fields: ["categoryId"] },
         { fields: ["status"] },
         { fields: ["createdAt"] },
         { fields: ["views"] },
+        { fields: ["likes"] },
       ],
     },
   );

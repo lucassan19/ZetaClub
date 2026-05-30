@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
-import VideoPlayer from './pages/VideoPlayer';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
-import AgeVerification from './pages/AgeVerification';
-import PublicLayout from './layouts/PublicLayout';
-import AdminLayout from './layouts/AdminLayout';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import Home from "./pages/Home";
+import VideoPlayer from "./pages/VideoPlayer";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AgeVerification from "./pages/AgeVerification";
+
+import PublicLayout from "./layouts/PublicLayout";
+import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
-  const [isVerified, setIsVerified] = useState(localStorage.getItem('age_verified') === 'true');
+  const [isVerified, setIsVerified] = useState(
+    sessionStorage.getItem("age_verified") === "true",
+  );
 
   const handleVerify = () => {
-    localStorage.setItem('age_verified', 'true');
+    sessionStorage.setItem("age_verified", "true");
     setIsVerified(true);
   };
 
@@ -24,7 +34,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rotas Públicas com PublicLayout */}
+        {/* Rotas Públicas */}
         <Route
           path="/"
           element={
@@ -33,6 +43,7 @@ function App() {
             </PublicLayout>
           }
         />
+
         <Route
           path="/video/:id"
           element={
@@ -42,10 +53,10 @@ function App() {
           }
         />
 
-        {/* Rotas Admin sem Layout (Apenas Login) */}
+        {/* Login Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Rotas Admin com AdminLayout Protegido */}
+        {/* Dashboard Admin */}
         <Route
           path="/admin"
           element={
@@ -56,6 +67,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin/dashboard"
           element={
@@ -66,8 +78,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
-        {/* Placeholder para futuras rotas admin solicitadas */}
+
+        {/* Futuras rotas */}
         <Route
           path="/admin/videos"
           element={
@@ -78,6 +90,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin/categorias"
           element={

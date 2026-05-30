@@ -1,13 +1,13 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Play, LogOut, ShieldCheck } from 'lucide-react';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Play, LogOut, ShieldCheck } from "lucide-react";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/admin/login');
+    localStorage.removeItem("token");
+    navigate("/admin/login");
   };
 
   return (
@@ -16,10 +16,14 @@ const AdminNavbar = () => {
         <div className="flex items-center justify-between h-20">
           <Link to="/admin/dashboard" className="flex items-center gap-3 group">
             <div className="bg-primary-600 p-2 rounded-xl shadow-lg">
-              <Play fill="currentColor" size={24} className="text-white ml-0.5" />
+              <Play
+                fill="currentColor"
+                size={24}
+                className="text-white ml-0.5"
+              />
             </div>
             <span className="text-2xl font-black text-white">
-              Zeta<span className="text-primary-500">Admin</span>
+              67<span className="text-primary-500">Admin</span>
             </span>
           </Link>
 
@@ -28,8 +32,8 @@ const AdminNavbar = () => {
               <ShieldCheck size={18} />
               Modo Administrador
             </div>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               className="flex items-center gap-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl transition-all font-bold text-sm border border-red-500/20"
             >
               <LogOut size={18} />

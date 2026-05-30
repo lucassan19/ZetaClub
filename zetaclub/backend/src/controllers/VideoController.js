@@ -439,6 +439,66 @@ exports.updateVideo = async (req, res) => {
   }
 };
 
+exports.likeVideo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const video = await Video.findByPk(id);
+
+    if (!video) {
+      return res.status(404).json({
+        message: "Vídeo não encontrado",
+      });
+    }
+
+    await video.increment("likes");
+
+    await video.reload();
+
+    return res.json({
+      success: true,
+      likes: video.likes,
+      dislikes: video.dislikes,
+    });
+  } catch (error) {
+    console.error("[LIKE_VIDEO_ERROR]:", error);
+
+    return res.status(500).json({
+      message: "Erro ao curtir vídeo",
+    });
+  }
+};
+
+exports.dislikeVideo = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const video = await Video.findByPk(id);
+
+    if (!video) {
+      return res.status(404).json({
+        message: "Vídeo não encontrado",
+      });
+    }
+
+    await video.increment("dislikes");
+
+    await video.reload();
+
+    return res.json({
+      success: true,
+      likes: video.likes,
+      dislikes: video.dislikes,
+    });
+  } catch (error) {
+    console.error("[DISLIKE_VIDEO_ERROR]:", error);
+
+    return res.status(500).json({
+      message: "Erro ao descurtir vídeo",
+    });
+  }
+};
+
 exports.deleteVideo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -446,7 +506,9 @@ exports.deleteVideo = async (req, res) => {
     const video = await Video.findByPk(id);
 
     if (!video) {
-      return res.status(404).json({ message: "Vídeo não encontrado" });
+      return res.status(404).json({
+        message: "Vídeo não encontrado",
+      });
     }
 
     const videoDir = path.join(uploadsRoot, "videos", String(id));

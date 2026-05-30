@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Play, Search, User, Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Play, Search, User, Menu, X } from "lucide-react";
 
 const PublicNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSearch = (e) => {
@@ -23,15 +23,22 @@ const PublicNavbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group shrink-0">
             <div className="bg-primary-600 p-2 rounded-xl shadow-lg shadow-primary-900/20 group-hover:scale-110 transition-transform duration-300">
-              <Play fill="currentColor" size={24} className="text-white ml-0.5" />
+              <Play
+                fill="currentColor"
+                size={24}
+                className="text-white ml-0.5"
+              />
             </div>
             <span className="text-2xl font-black tracking-tighter text-white">
-              Zeta<span className="text-primary-500">Club</span>
+              67<span className="text-primary-500">videos</span>
             </span>
           </Link>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex relative flex-1 max-w-xl">
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex relative flex-1 max-w-xl"
+          >
             <input
               type="text"
               placeholder="O que você quer assistir hoje?"
@@ -39,11 +46,14 @@ const PublicNavbar = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <Search className="absolute left-4 top-3.5 text-slate-500" size={20} />
+            <Search
+              className="absolute left-4 top-3.5 text-slate-500"
+              size={20}
+            />
             {search && (
-              <button 
-                type="button" 
-                onClick={() => setSearch('')}
+              <button
+                type="button"
+                onClick={() => setSearch("")}
                 className="absolute right-4 top-3.5 text-slate-500 hover:text-white"
               >
                 <X size={18} />
@@ -53,8 +63,8 @@ const PublicNavbar = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="hidden md:flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl transition-all font-bold text-sm border border-white/5"
             >
               <User size={18} />
@@ -62,7 +72,7 @@ const PublicNavbar = () => {
             </Link>
 
             {/* Mobile Menu Toggle */}
-            <button 
+            <button
               className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -82,11 +92,14 @@ const PublicNavbar = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <Search className="absolute left-4 top-4.5 text-slate-500" size={20} />
+              <Search
+                className="absolute left-4 top-4.5 text-slate-500"
+                size={20}
+              />
             </form>
             <div className="flex flex-col gap-3">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-3 p-4 bg-slate-800 rounded-xl font-bold text-slate-200"
               >

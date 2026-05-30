@@ -1,97 +1,122 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
-import VideoPlayer from './pages/VideoPlayer';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
-import AgeVerification from './pages/AgeVerification';
-import PublicLayout from './layouts/PublicLayout';
-import AdminLayout from './layouts/AdminLayout';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 
-function App() {
-  const [isVerified, setIsVerified] = useState(localStorage.getItem('age_verified') === 'true');
+import Home from "./pages/Home";
+import VideoPlayer from "./pages/VideoPlayer";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AgeVerification from "./pages/AgeVerification";
+
+import PublicLayout from "./layouts/PublicLayout";
+import AdminLayout from "./layouts/AdminLayout";
+
+function AppContent() {
+  const location = useLocation();
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  const [isVerified, setIsVerified] = useState(
+    sessionStorage.getItem("age_verified") === "true",
+  );
 
   const handleVerify = () => {
-    localStorage.setItem('age_verified', 'true');
+    sessionStorage.setItem("age_verified", "true");
     setIsVerified(true);
   };
 
-  if (!isVerified) {
+  // Modal +18 apenas fora do admin
+  if (!isAdminRoute && !isVerified) {
     return <AgeVerification onVerify={handleVerify} />;
   }
 
   return (
+    <Routes>
+      {/* Rotas Públicas */}
+      <Route
+        path="/"
+        element={
+          <PublicLayout>
+            <Home />
+          </PublicLayout>
+        }
+      />
+
+      <Route
+        path="/video/:id"
+        element={
+          <PublicLayout>
+            <VideoPlayer />
+          </PublicLayout>
+        }
+      />
+
+      {/* Login Admin */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+
+      {/* Dashboard Admin */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Futuras rotas */}
+      <Route
+        path="/admin/videos"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/categorias"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <Routes>
-        {/* Rotas Públicas com PublicLayout */}
-        <Route
-          path="/"
-          element={
-            <PublicLayout>
-              <Home />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/video/:id"
-          element={
-            <PublicLayout>
-              <VideoPlayer />
-            </PublicLayout>
-          }
-        />
-
-        {/* Rotas Admin sem Layout (Apenas Login) */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-
-        {/* Rotas Admin com AdminLayout Protegido */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        
-        {/* Placeholder para futuras rotas admin solicitadas */}
-        <Route
-          path="/admin/videos"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/categorias"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AppContent />
     </Router>
   );
 }

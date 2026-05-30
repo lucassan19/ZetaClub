@@ -1,9 +1,9 @@
-import React from 'react';
-import { ShieldAlert, Play } from 'lucide-react';
+import React from "react";
+import { ShieldAlert, Play } from "lucide-react";
 
 const AgeVerification = ({ onVerify }) => {
   const handleReject = () => {
-    window.location.href = 'https://www.google.com';
+    window.location.href = "https://www.google.com";
   };
 
   return (
@@ -12,18 +12,21 @@ const AgeVerification = ({ onVerify }) => {
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-2 text-4xl font-black text-primary-500 mb-2">
             <Play fill="currentColor" size={40} />
-            <span>ZetaClub</span>
+            <span>67videos</span>
           </div>
           <div className="bg-red-500/10 p-4 rounded-full border border-red-500/20 text-red-500 mb-2">
             <ShieldAlert size={48} />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Este é um site adulto</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">
+            Este é um site adulto
+          </h1>
         </div>
 
         <div className="space-y-4">
           <p className="text-slate-400 leading-relaxed">
-            Este site contém conteúdo sexualmente explícito e é destinado apenas a adultos. 
-            Para continuar, você deve confirmar que tem pelo menos 18 anos de idade.
+            Este site contém conteúdo sexualmente explícito e é destinado apenas
+            a adultos. Para continuar, você deve confirmar que tem pelo menos 18
+            anos de idade.
           </p>
           <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent w-full"></div>
           <p className="text-sm text-slate-500 font-medium uppercase tracking-widest">
@@ -47,7 +50,8 @@ const AgeVerification = ({ onVerify }) => {
         </div>
 
         <p className="text-xs text-slate-600">
-          Ao entrar, você concorda com nossos termos de uso e política de privacidade.
+          Ao entrar, você concorda com nossos termos de uso e política de
+          privacidade.
         </p>
       </div>
     </div>
