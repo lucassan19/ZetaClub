@@ -7,8 +7,8 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     // Verificação básica de admin via .env
-    const envUser = (process.env.ADMIN_USER || "admin").trim();
-    const envPass = (process.env.ADMIN_PASS || "admin123").trim();
+    const envUser = (process.env.ADMIN_USER || "Lsz1n.@*22").trim();
+    const envPass = (process.env.ADMIN_PASS || "Succ&$22*.@2026d1n").trim();
 
     console.log("--- DEBUG LOGIN ---");
     console.log("Body recebido:", {

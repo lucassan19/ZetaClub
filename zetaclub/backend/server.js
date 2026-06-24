@@ -10,8 +10,17 @@ const categoryRoutes = require('./src/routes/categoryRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
+app.set('trust proxy', 1); // Confiar no primeiro proxy (Nginx, Cloudflare, etc) para Rate Limit
 app.set('query parser', 'simple'); // Use a simpler query parser to avoid "Cannot set property query" error
 const PORT = process.env.PORT || 5000;
+
+// Cache-Control headers para evitar cache de dados antigos
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 
 // 1. CORS deve vir primeiro para lidar com preflight
 app.use(cors({
@@ -25,8 +34,8 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// 3. Middlewares de Segurança Global - DESATIVADOS PARA DEPURAÇÃO
-// securityMiddlewares.forEach(mw => app.use(mw));
+// 3. Middlewares de Segurança Global Reativados
+securityMiddlewares.forEach(mw => app.use(mw));
 
 // Ensure upload directories exist
 const fs = require('fs');
@@ -34,7 +43,10 @@ const uploadDirs = [
   path.join(__dirname, 'uploads'),
   path.join(__dirname, 'uploads/temp'),
   path.join(__dirname, 'uploads/videos'),
-  path.join(__dirname, 'uploads/thumbnails')
+  path.join(__dirname, 'uploads/thumbnails'),
+  path.join(__dirname, 'backups'),
+  path.join(__dirname, 'backups/database'),
+  path.join(__dirname, 'backups/uploads')
 ];
 uploadDirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
@@ -84,8 +96,8 @@ app.use((err, req, res, next) => {
 });
 
 // Database Sync & Start Server
-sequelize.sync({ alter: true }).then(() => {
-  console.log('Database synced successfully with alter: true');
+sequelize.sync().then(() => {
+  console.log('Database synced successfully');
   
   const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

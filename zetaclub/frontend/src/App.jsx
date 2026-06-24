@@ -10,6 +10,11 @@ import Home from "./pages/Home";
 import VideoPlayer from "./pages/VideoPlayer";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Favorites from "./pages/Favorites";
+import WatchHistory from "./pages/History";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Contact from "./pages/Contact";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AgeVerification from "./pages/AgeVerification";
@@ -49,6 +54,51 @@ function App() {
           element={
             <PublicLayout>
               <VideoPlayer />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/favorites"
+          element={
+            <PublicLayout>
+              <Favorites />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/history"
+          element={
+            <PublicLayout>
+              <WatchHistory />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/termos-de-uso"
+          element={
+            <PublicLayout>
+              <TermsOfUse />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/politica-de-privacidade"
+          element={
+            <PublicLayout>
+              <PrivacyPolicy />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/contato"
+          element={
+            <PublicLayout>
+              <Contact />
             </PublicLayout>
           }
         />

@@ -11,6 +11,18 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  // Device ID para persistência sem login
+  let deviceId = localStorage.getItem('deviceId');
+  if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('deviceId', deviceId);
+  }
+  
+  // Adicionar deviceId em todas as requisições GET se necessário
+  if (config.method === 'get') {
+    config.params = { ...config.params, deviceId };
+  }
+
   return config;
 });
 

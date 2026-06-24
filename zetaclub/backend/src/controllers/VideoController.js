@@ -1,4 +1,4 @@
-const { Video, Category, ViewLog, sequelize } = require("../models");
+const { Video, Category, ViewLog, Favorite, Progress, VideoReaction, sequelize } = require("../models");
 const { Op } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
@@ -19,8 +19,13 @@ async function ensureDir(dir) {
 
 async function removePath(targetPath) {
   try {
+    console.log(`[REMOVE_PATH] Tentando remover: ${targetPath}`);
     if (targetPath && fs.existsSync(targetPath)) {
+      console.log(`[REMOVE_PATH] Caminho existe, removendo recursivamente`);
       await fs.promises.rm(targetPath, { recursive: true, force: true });
+      console.log(`[REMOVE_PATH] Remoção concluída com sucesso`);
+    } else {
+      console.log(`[REMOVE_PATH] Caminho não existe, nada a fazer`);
     }
   } catch (error) {
     console.error("[REMOVE_PATH_ERROR]:", error);
@@ -151,7 +156,7 @@ exports.getAdminStats = async (req, res) => {
 
 exports.getAllVideos = async (req, res) => {
   try {
-    const { search, categoryId, limit = 12, offset = 0 } = req.query;
+    const { search, categoryId, sort, limit = 12, offset = 0 } = req.query;
 
     const where = { status: "ready" };
 
@@ -166,10 +171,17 @@ exports.getAllVideos = async (req, res) => {
       where.categoryId = categoryId;
     }
 
+    let order = [["createdAt", "DESC"]];
+    if (sort === "views") {
+      order = [["views", "DESC"]];
+    } else if (sort === "likes") {
+      order = [["likes", "DESC"]];
+    }
+
     const { count, rows: videos } = await Video.findAndCountAll({
       where,
       include: [Category],
-      order: [["createdAt", "DESC"]],
+      order,
       limit: Number(limit),
       offset: Number(offset),
     });
@@ -439,70 +451,143 @@ exports.updateVideo = async (req, res) => {
   }
 };
 
+exports.getVideoReaction = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deviceId } = req.query;
+    
+    if (!deviceId) {
+      return res.status(400).json({ message: "deviceId é obrigatório" });
+    }
+    
+    const video = await Video.findByPk(id);
+    
+    if (!video) {
+      return res.status(404).json({ message: "Vídeo não encontrado" });
+    }
+    
+    const reaction = await VideoReaction.findOne({
+      where: { videoId: id, deviceId }
+    });
+    
+    return res.json({
+      type: reaction?.type || null,
+      likes: video.likes || 0,
+      dislikes: video.dislikes || 0
+    });
+  } catch (error) {
+    console.error("[GET_VIDEO_REACTION_ERROR]:", error);
+    return res.status(500).json({ message: "Erro interno" });
+  }
+};
+
 exports.likeVideo = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const video = await Video.findByPk(id);
-
-    if (!video) {
-      return res.status(404).json({
-        message: "Vídeo não encontrado",
-      });
+    const { deviceId } = req.body;
+    
+    if (!deviceId) {
+      return res.status(400).json({ message: "deviceId é obrigatório" });
     }
-
-    await video.increment("likes");
-
+    
+    const video = await Video.findByPk(id);
+    
+    if (!video) {
+      return res.status(404).json({ message: "Vídeo não encontrado" });
+    }
+    
+    const existingReaction = await VideoReaction.findOne({
+      where: { videoId: id, deviceId }
+    });
+    
+    if (existingReaction) {
+      if (existingReaction.type === 'like') {
+        await video.reload();
+        return res.json({
+          success: true,
+          likes: video.likes,
+          dislikes: video.dislikes,
+          type: 'like'
+        });
+      } else {
+        await existingReaction.update({ type: 'like' });
+        await video.increment('likes');
+        await video.decrement('dislikes');
+      }
+    } else {
+      await VideoReaction.create({ videoId: id, deviceId, type: 'like' });
+      await video.increment('likes');
+    }
+    
     await video.reload();
-
+    
     return res.json({
       success: true,
       likes: video.likes,
       dislikes: video.dislikes,
+      type: 'like'
     });
   } catch (error) {
     console.error("[LIKE_VIDEO_ERROR]:", error);
-
-    return res.status(500).json({
-      message: "Erro ao curtir vídeo",
-    });
+    return res.status(500).json({ message: "Erro ao curtir vídeo" });
   }
 };
 
 exports.dislikeVideo = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const video = await Video.findByPk(id);
-
-    if (!video) {
-      return res.status(404).json({
-        message: "Vídeo não encontrado",
-      });
+    const { deviceId } = req.body;
+    
+    if (!deviceId) {
+      return res.status(400).json({ message: "deviceId é obrigatório" });
     }
-
-    await video.increment("dislikes");
-
+    
+    const video = await Video.findByPk(id);
+    
+    if (!video) {
+      return res.status(404).json({ message: "Vídeo não encontrado" });
+    }
+    
+    const existingReaction = await VideoReaction.findOne({
+      where: { videoId: id, deviceId }
+    });
+    
+    if (existingReaction) {
+      if (existingReaction.type === 'dislike') {
+        await video.reload();
+        return res.json({
+          success: true,
+          likes: video.likes,
+          dislikes: video.dislikes,
+          type: 'dislike'
+        });
+      } else {
+        await existingReaction.update({ type: 'dislike' });
+        await video.decrement('likes');
+        await video.increment('dislikes');
+      }
+    } else {
+      await VideoReaction.create({ videoId: id, deviceId, type: 'dislike' });
+      await video.increment('dislikes');
+    }
+    
     await video.reload();
-
+    
     return res.json({
       success: true,
       likes: video.likes,
       dislikes: video.dislikes,
+      type: 'dislike'
     });
   } catch (error) {
     console.error("[DISLIKE_VIDEO_ERROR]:", error);
-
-    return res.status(500).json({
-      message: "Erro ao descurtir vídeo",
-    });
+    return res.status(500).json({ message: "Erro ao descurtir vídeo" });
   }
 };
 
 exports.deleteVideo = async (req, res) => {
   try {
     const { id } = req.params;
-
     const video = await Video.findByPk(id);
 
     if (!video) {
@@ -511,22 +596,148 @@ exports.deleteVideo = async (req, res) => {
       });
     }
 
-    const videoDir = path.join(uploadsRoot, "videos", String(id));
+    // Deletar registros dependentes manualmente para evitar FK errors
+    await ViewLog.destroy({ where: { videoId: id } });
+    await Favorite.destroy({ where: { videoId: id } });
+    await Progress.destroy({ where: { videoId: id } });
+    await VideoReaction.destroy({ where: { videoId: id } });
 
+    const videoDir = path.join(uploadsRoot, "videos", String(id));
     await removePath(videoDir);
 
     await video.destroy();
-
-    console.log(`[DELETE_SUCCESS] Vídeo ${id} removido completamente.`);
 
     return res.json({
       message: "Vídeo e arquivos relacionados foram excluídos com sucesso.",
     });
   } catch (error) {
     console.error("[DELETE_VIDEO_ERROR]:", error);
-
     return res.status(500).json({
       message: "Erro interno ao excluir o vídeo.",
     });
+  }
+};
+
+// Favoritos
+exports.toggleFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deviceId } = req.body;
+
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    const favorite = await Favorite.findOne({ where: { videoId: id, deviceId } });
+
+    if (favorite) {
+      await favorite.destroy();
+      return res.json({ favorited: false });
+    } else {
+      await Favorite.create({ videoId: id, deviceId });
+      return res.json({ favorited: true });
+    }
+  } catch (error) {
+    console.error("[TOGGLE_FAVORITE_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao favoritar" });
+  }
+};
+
+exports.checkFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deviceId } = req.query;
+
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    const favorite = await Favorite.findOne({ where: { videoId: id, deviceId } });
+    return res.json({ favorited: !!favorite });
+  } catch (error) {
+    console.error("[CHECK_FAVORITE_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao verificar favorito" });
+  }
+};
+
+exports.getFavorites = async (req, res) => {
+  try {
+    const { deviceId } = req.query;
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    const favorites = await Favorite.findAll({
+      where: { deviceId },
+      include: [{
+        model: Video,
+        include: [Category]
+      }],
+      order: [['createdAt', 'DESC']]
+    });
+
+    const videos = favorites.map(f => f.Video).filter(v => v && v.status === 'ready');
+    return res.json(videos);
+  } catch (error) {
+    console.error("[GET_FAVORITES_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao buscar favoritos" });
+  }
+};
+
+// Progresso
+exports.saveProgress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deviceId, currentTime, duration } = req.body;
+
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    await Progress.upsert({
+      videoId: id,
+      deviceId,
+      currentTime,
+      duration
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("[SAVE_PROGRESS_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao salvar progresso" });
+  }
+};
+
+exports.getProgress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deviceId } = req.query;
+
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    const progress = await Progress.findOne({ where: { videoId: id, deviceId } });
+    return res.json(progress || { currentTime: 0 });
+  } catch (error) {
+    console.error("[GET_PROGRESS_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao buscar progresso" });
+  }
+};
+
+exports.getContinueWatching = async (req, res) => {
+  try {
+    const { deviceId } = req.query;
+    if (!deviceId) return res.status(400).json({ message: "deviceId é obrigatório" });
+
+    const progressList = await Progress.findAll({
+      where: { deviceId },
+      include: [{
+        model: Video,
+        include: [Category]
+      }],
+      order: [['updatedAt', 'DESC']],
+      limit: 10
+    });
+
+    const list = progressList.map(p => ({
+      ...p.toJSON(),
+      video: p.Video
+    })).filter(p => p.video && p.video.status === 'ready');
+
+    return res.json(list);
+  } catch (error) {
+    console.error("[GET_CONTINUE_WATCHING_ERROR]:", error);
+    return res.status(500).json({ message: "Erro ao buscar progresso de visualização" });
   }
 };

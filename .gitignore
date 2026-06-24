@@ -55,3 +55,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Backup
+zetaclub_backup_funcionando/    
