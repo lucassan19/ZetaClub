@@ -23,9 +23,10 @@ const WatchHistory = () => {
       try {
         setLoading(true);
         const res = await api.get(`/videos/continue-watching?deviceId=${getDeviceId()}`);
-        setHistory(res.data);
+        setHistory(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Error fetching history:", error);
+        setHistory([]);
       } finally {
         setLoading(false);
       }

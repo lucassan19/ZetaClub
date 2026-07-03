@@ -63,14 +63,18 @@ const Home = () => {
         api.get("/categories"),
       ]);
 
+      const newVideos = Array.isArray(videosRes.data?.videos) 
+        ? videosRes.data.videos 
+        : (Array.isArray(videosRes.data) ? videosRes.data : []);
+        
       if (isNewSearch) {
-        setVideos(videosRes.data.videos);
+        setVideos(newVideos);
       } else {
-        setVideos((prev) => [...prev, ...videosRes.data.videos]);
+        setVideos((prev) => [...prev, ...newVideos]);
       }
 
-      setTotalVideos(videosRes.data.count);
-      setCategories(categoriesRes.data);
+      setTotalVideos(videosRes.data?.count || 0);
+      setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

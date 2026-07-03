@@ -23,9 +23,10 @@ const Favorites = () => {
       try {
         setLoading(true);
         const res = await api.get(`/videos/favorites?deviceId=${getDeviceId()}`);
-        setVideos(res.data);
+        setVideos(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Error fetching favorites:", error);
+        setVideos([]);
       } finally {
         setLoading(false);
       }
