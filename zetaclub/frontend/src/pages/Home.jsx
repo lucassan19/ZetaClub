@@ -63,9 +63,14 @@ const Home = () => {
         api.get("/categories"),
       ]);
 
+      console.log("📡 API Response /videos:", videosRes.data);
+      console.log("📡 API Response /categories:", categoriesRes.data);
+
       const newVideos = Array.isArray(videosRes.data?.videos) 
         ? videosRes.data.videos 
         : (Array.isArray(videosRes.data) ? videosRes.data : []);
+        
+      console.log("✅ newVideos to render:", newVideos);
         
       if (isNewSearch) {
         setVideos(newVideos);
@@ -76,7 +81,7 @@ const Home = () => {
       setTotalVideos(videosRes.data?.count || 0);
       setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("❌ Error fetching data:", error);
     } finally {
       setLoading(false);
       setLoadingMore(false);
