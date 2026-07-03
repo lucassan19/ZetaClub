@@ -103,46 +103,12 @@ function App() {
           }
         />
 
-        {/* Login Admin */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+        {/* Login Admin (rota secreta) */}
+        <Route path="/d9a71f2c6e84b5a3" element={<AdminLogin />} />
 
-        {/* Dashboard Admin */}
+        {/* Dashboard Admin (rota secreta) */}
         <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Futuras rotas */}
-        <Route
-          path="/admin/videos"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/categorias"
+          path="/d9a71f2c6e84b5a3/dashboard"
           element={
             <ProtectedRoute>
               <AdminLayout>

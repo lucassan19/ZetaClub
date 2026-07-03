@@ -7,9 +7,7 @@ const AdminLayout = ({ children }) => {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { path: '/admin/videos', label: 'Vídeos', icon: <Video size={20} /> },
-    { path: '/admin/categorias', label: 'Categorias', icon: <Layers size={20} /> },
+    { path: '/d9a71f2c6e84b5a3/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   ];
 
   return (

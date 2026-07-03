@@ -22,7 +22,7 @@ const AdminLogin = () => {
       const res = await api.post("/auth/login", { username, password });
       console.log("Login bem sucedido!");
       localStorage.setItem("token", res.data.token);
-      navigate("/admin/dashboard");
+      navigate("/d9a71f2c6e84b5a3/dashboard");
     } catch (err) {
       console.error("Erro detalhado no login:", {
         status: err.response?.status,

@@ -7,14 +7,14 @@ const AdminNavbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/admin/login");
+    navigate("/");
   };
 
   return (
     <nav className="bg-slate-900 border-b border-white/5 sticky top-0 z-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-20">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 group">
+          <Link to="/d9a71f2c6e84b5a3/dashboard" className="flex items-center gap-3 group">
             <div className="bg-primary-600 p-2 rounded-xl shadow-lg">
               <Play
                 fill="currentColor"

@@ -10,7 +10,7 @@ const Contact = () => {
         <section>
           <h2 className="text-2xl font-bold text-white mb-4">Entre em Contato</h2>
           <p>Para dúvidas, sugestões ou questões legais, entre em contato conosco.</p>
-          <p>Contato@67videos.com</p>
+          <p>Contato67videos@gmail.com</p>
         </section>
       </div>
     </div>
