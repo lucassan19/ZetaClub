@@ -57,7 +57,12 @@ uploadDirs.forEach(dir => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Servir frontend em produção
+// Routes (API vem PRIMEIRO!)
+app.use('/api/videos', videoRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/auth', authRoutes);
+
+// Servir frontend em produção (último!)
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../frontend/dist');
   app.use(express.static(frontendPath));
@@ -65,11 +70,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
-
-// Routes
-app.use('/api/videos', videoRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/auth', authRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
