@@ -48,15 +48,21 @@ const VideoPlayer = () => {
     const loadVideo = async () => {
       try {
         setLoading(true);
-        const [videoRes, relatedRes, favRes, progRes, reactionRes] = await Promise.all([
-          api.get(`/videos/${id}`),
+        setLoadingRelated(true);
+        
+        // Carregar vídeo principal PRIMEIRO
+        const videoRes = await api.get(`/videos/${id}`);
+        setVideo(videoRes.data);
+        setLoading(false); // Renderizar player imediatamente
+        
+        // Carregar dados secundários em SEGUNDO PLANO
+        const [relatedRes, favRes, progRes, reactionRes] = await Promise.all([
           api.get(`/videos/${id}/related`),
           api.get(`/videos/${id}/favorite?deviceId=${getDeviceId()}`),
           api.get(`/videos/${id}/progress?deviceId=${getDeviceId()}`),
           api.get(`/videos/${id}/reaction?deviceId=${getDeviceId()}`)
         ]);
 
-        setVideo(videoRes.data);
         setLikesCount(reactionRes.data.likes || 0);
         setDislikesCount(reactionRes.data.dislikes || 0);
         setLiked(reactionRes.data.type === 'like');
@@ -71,8 +77,8 @@ const VideoPlayer = () => {
 
       } catch (error) {
         console.error("Error loading video:", error);
-      } finally {
         setLoading(false);
+      } finally {
         setLoadingRelated(false);
       }
     };
@@ -144,7 +150,7 @@ const VideoPlayer = () => {
         });
       } else if (mp4Url) {
         videoElement.src = mp4Url;
-        videoElement.onloadeddata = () => {
+        videoElement.onloadedmetadata = () => {
           setIsVideoLoading(false);
           if (!viewRegistered) {
             api.post(`/videos/${id}/view`).catch(err => console.error('Error counting view', err));
@@ -256,6 +262,7 @@ const VideoPlayer = () => {
               controlsList="nodownload"
               poster={getAssetUrl(video.thumbnailUrl)}
               playsInline
+              preload="metadata"
               onContextMenu={(e) => e.preventDefault()}
             />
           </div>

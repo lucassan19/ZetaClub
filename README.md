@@ -1,12 +1,6 @@
 # 67videos
 
-Aqui está a documentação completa e detalhada do projeto **67videos**. Esta guia explica a arquitetura, a função de cada arquivo e como o sistema opera como um todo.
-
----
-
-# 📘 Documentação 67videos
-
-O **67videos** é uma plataforma de streaming de vídeo profissional, construída com foco em performance, segurança e escalabilidade. O sistema utiliza uma arquitetura separada entre **Frontend (React)** e **Backend (Node.js)**.  
+Plataforma de streaming de vídeo profissional com foco em performance, segurança e escalabilidade. Arquitetura separada entre **Frontend (React)** e **Backend (Node.js)**.  
 
 ---
 
@@ -69,7 +63,7 @@ Localizado em `/zetaclub/frontend`, construído com **React.js** e estilizado co
 
 - [AgeVerification.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/AgeVerification.jsx): Tela obrigatória de entrada que avisa sobre conteúdo adulto.
 - [Home.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/Home.jsx): Galeria de vídeos com filtros de categoria, busca com debounce, ordenação (recentes, mais vistos, mais curtidos) e skeletons de loading.
-- [VideoPlayer.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/VideoPlayer.jsx): Player avançado que suporta HLS, likes/dislikes, favoritos, e progresso de reprodução automático. Botão de download removido.
+- [VideoPlayer.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/VideoPlayer.jsx): Player avançado com otimizações de performance, suporte HLS, likes/dislikes, favoritos e progresso de reprodução automático. Botão de download removido.
 - [Favorites.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/Favorites.jsx): Lista de vídeos salvos como favoritos.
 - [AdminLogin.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/AdminLogin.jsx): Tela de acesso restrito ao painel.
 - [AdminDashboard.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/AdminDashboard.jsx): Painel com gráficos de visualizações, lista de vídeos e gerenciamento de categorias.
@@ -110,9 +104,9 @@ Localizado em `/zetaclub/frontend`, construído com **React.js** e estilizado co
 - **Contato**: http://localhost:5173/contact
 
 ### Área Administrativa (Acesso Restrito)
-- **Página de Login**: http://localhost:5173/admin/login
-  - Nota: Esta rota está "escondida", ou seja, não há botão público para ela. Você deve digitar o endereço diretamente no navegador.
-- **Painel Administrativo**: http://localhost:5173/admin/dashboard
+- **Página de Login**: http://localhost:5173/d9a71f2c6e84b5a3
+  - Nota: Esta rota é SECRETA e escondida! Não há botão público para ela. Você deve digitar o endereço diretamente no navegador.
+- **Painel Administrativo**: http://localhost:5173/d9a71f2c6e84b5a3/dashboard
 
 ### Credenciais Padrão do Administrador
 As credenciais são configuradas no arquivo [.env](file:///c:/ZetaClub/zetaclub/backend/.env). Os valores padrão (fallback) são:
@@ -132,7 +126,7 @@ As credenciais são configuradas no arquivo [.env](file:///c:/ZetaClub/zetaclub/
 - **Helmet**: Headers de segurança HTTP ativados, com CSP compatível com streaming HLS.
 - **Rate Limiting**: Limites diferenciados para login, upload e engajamento para evitar ataques.
 - **Trust Proxy**: Configurado para funcionar corretamente atrás de Nginx/Cloudflare na VPS.
-- **Proteção de Rotas**: Todas as rotas `/admin/*` exigem token JWT válido e role `admin`.
+- **Proteção de Rotas**: Todas as rotas administrativas exigem token JWT válido e role `admin`. As URLs são secretas e aleatórias para evitar acesso não autorizado.
 - **Sanitização de Entrada**: Middleware de validação limpa textos de formulários.
 - **Armazenamento de Arquivos**: Arquivos temporários são salvos com nomes aleatórios e movidos para pastas organizadas por ID de vídeo.
 
@@ -194,6 +188,14 @@ A interface roda por padrão na porta **5173**.
 
 ---
 
+## ⚡ Otimizações de Performance do Player
+
+Foram implementadas otimizações no [VideoPlayer.jsx](file:///c:/ZetaClub/zetaclub/frontend/src/pages/VideoPlayer.jsx) para reduzir o tempo de carregamento inicial, especialmente em dispositivos móveis:
+
+1. **`preload="metadata"`**: Carrega apenas metadados do vídeo (duração, resolução) imediatamente, economizando banda
+2. **Evento `loadedmetadata`**: Remove o estado de loading assim que os metadados são recebidos (muito mais rápido que `loadeddata`)
+3. **Carregamento Prioritário**: Requisição do vídeo principal é feita primeiro, player renderizado imediatamente, dados secundários carregados em segundo plano
+
 ## 📊 Status de Funcionalidades
 
 | Funcionalidade | Status |
@@ -212,6 +214,7 @@ A interface roda por padrão na porta **5173**.
 | Middlewares de Segurança | ✅ |
 | Backup Automático | ✅ |
 | Páginas Legais (Termos, Política, Contato) | ✅ |
+| Otimizações de Performance do Player | ✅ |
 
 ---
 
