@@ -3,7 +3,7 @@ const { Op } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { generateThumbnail } = require("../utils/VideoProcessor");
+const { generateThumbnail, processVideo } = require("../utils/VideoProcessor");
 
 // Caminho fixo da raiz do backend
 const backendRoot = path.resolve(__dirname, "../../");
@@ -326,9 +326,30 @@ exports.createVideo = async (req, res) => {
       videoUrl,
       thumbnailUrl,
       hlsUrl: null,
-      status: "ready",
+      status: "processing",
       qualities: JSON.stringify(["mp4"]),
     });
+
+    // Processar HLS em background
+    (async () => {
+      try {
+        const result = await processVideo(finalVideoPath, videoDir);
+        // Converter caminho absoluto para URL pública
+        const relativePath = path.relative(uploadsRoot, result.hlsPath).replace(/\\/g, '/');
+        const hlsUrl = publicPath(...relativePath.split('/'));
+        // Adicionar "mp4" às qualidades
+        const qualities = [...result.qualities, { name: "mp4" }];
+        await video.update({
+          hlsUrl,
+          status: "ready",
+          qualities: JSON.stringify(qualities),
+        });
+        console.log(`[HLS_SUCCESS] Vídeo ${video.id} processado com sucesso.`);
+      } catch (error) {
+        console.error(`[HLS_ERROR] Falha ao processar vídeo ${video.id}:`, error);
+        await video.update({ status: "failed" });
+      }
+    })();
 
     console.log(`[UPLOAD_SUCCESS] Vídeo ${video.id} salvo com sucesso.`);
     console.log(`[UPLOAD_SUCCESS] URL pública: ${videoUrl}`);
@@ -402,7 +423,7 @@ exports.updateVideo = async (req, res) => {
 
       updatedData.videoUrl = publicPath("videos", video.id, finalFileName);
       updatedData.hlsUrl = null;
-      updatedData.status = "ready";
+      updatedData.status = "processing";
       updatedData.qualities = JSON.stringify(["mp4"]);
     }
 
@@ -432,6 +453,29 @@ exports.updateVideo = async (req, res) => {
     }
 
     await video.update(updatedData);
+
+    // Se um novo vídeo foi enviado, processar HLS em background
+    if (videoFile) {
+      (async () => {
+        try {
+          const result = await processVideo(finalVideoPath, videoDir);
+          // Converter caminho absoluto para URL pública
+          const relativePath = path.relative(uploadsRoot, result.hlsPath).replace(/\\/g, '/');
+          const hlsUrl = publicPath(...relativePath.split('/'));
+          // Adicionar "mp4" às qualidades
+          const qualities = [...result.qualities, { name: "mp4" }];
+          await video.update({
+            hlsUrl,
+            status: "ready",
+            qualities: JSON.stringify(qualities),
+          });
+          console.log(`[HLS_SUCCESS] Vídeo ${video.id} processado com sucesso.`);
+        } catch (error) {
+          console.error(`[HLS_ERROR] Falha ao processar vídeo ${video.id}:`, error);
+          await video.update({ status: "failed" });
+        }
+      })();
+    }
 
     return res.json(video);
   } catch (error) {
