@@ -2,10 +2,19 @@ const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const fs = require('fs');
 
+// Configurar caminhos explícitos para FFmpeg e FFprobe (especialmente para VPS)
+if (process.env.NODE_ENV === 'production') {
+  ffmpeg.setFfmpegPath('/usr/bin/ffmpeg');
+  ffmpeg.setFfprobePath('/usr/bin/ffprobe');
+}
+
+
 const getVideoResolution = (videoPath) => {
   return new Promise((resolve, reject) => {
+    console.log("[FFPROBE] Analisando resolução do vídeo:", videoPath);
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
+        console.error("[FFPROBE_ERROR] Erro ao analisar vídeo:", err);
         reject(err);
         return;
       }
@@ -14,6 +23,7 @@ const getVideoResolution = (videoPath) => {
         reject(new Error('No video stream found'));
         return;
       }
+      console.log("[FFPROBE] Resolução detectada:", videoStream.width, "x", videoStream.height);
       resolve({
         width: videoStream.width,
         height: videoStream.height
@@ -31,13 +41,8 @@ const processVideo = async (videoPath, outputDir) => {
     // Process all resolutions sequentially
     (async () => {
       try {
-        // Check if ffmpeg is available
-        await new Promise((resolve, reject) => {
-          ffmpeg.getAvailableFormats((err) => {
-            if (err) reject(new Error('FFmpeg not found or not working'));
-            else resolve();
-          });
-        });
+        // Check if ffmpeg is available - removido para não mascarar erros reais
+        // Vamos deixar o processamento iniciar e logar o erro real se acontecer
 
         // Obter resolução original
         const { height: originalHeight, width: originalWidth } = await getVideoResolution(videoPath);
@@ -67,7 +72,18 @@ const processVideo = async (videoPath, outputDir) => {
               .addOption('-hls_list_size', 0)
               .addOption('-threads', 1) // Limit to 1 thread to avoid crashing 1GB RAM server
               .addOption('-hls_segment_filename', path.join(resDir, 'segment%d.ts').replace(/\\/g, '/'))
-              .on('error', (err) => resReject(err))
+              .on("start", command => {
+                console.log("[FFMPEG] Command:", command);
+              })
+              .on("stderr", line => {
+                console.log("[FFMPEG]", line);
+              })
+              .on('error', (err, stdout, stderr) => {
+                console.error("[FFMPEG_ERROR] Complete error object:", err);
+                console.error("[FFMPEG_ERROR] stdout:", stdout);
+                console.error("[FFMPEG_ERROR] stderr:", stderr);
+                resReject(err);
+              })
               .on('end', () => {
                 const playlistPath = `${res.name}/playlist.m3u8`;
                 masterPlaylist += `#EXT-X-STREAM-INF:BANDWIDTH=${parseInt(res.bitrate) * 1000},RESOLUTION=${res.width}x${res.height}\n${playlistPath}\n`;
