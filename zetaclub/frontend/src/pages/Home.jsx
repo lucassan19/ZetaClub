@@ -124,7 +124,7 @@ const Home = () => {
               <span className="text-primary-500">porno</span> exclusivo.
             </h1>
             <p className="text-slate-400 text-lg mb-8 leading-relaxed font-medium">
-              Acesse os melhores vídeos pornos com qualidade Ultra HD, navegação inteligente e experiência imersiva feita para você.
+              {/* Acesse os melhores vídeos pornos com qualidade Ultra HD, navegação inteligente e experiência imersiva feita para você. */}
             </p>
             <div className="flex flex-wrap gap-4">
               {/* <button className="px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl font-bold transition-all shadow-lg shadow-primary-900/20 hover:scale-105 active:scale-95">
