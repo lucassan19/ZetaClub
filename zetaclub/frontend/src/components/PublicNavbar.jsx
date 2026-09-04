@@ -1,46 +1,46 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Play, Search, User, Menu, X, Heart, History } from "lucide-react";
+import { Play, Menu, X, LogIn, Zap } from "lucide-react";
+
+const NAV_LINKS = [
+  { label: "Início", href: "#inicio" },
+  { label: "Planos", href: "#planos" },
+  { label: "Prévias", href: "#previas" },
+  { label: "Como funciona", href: "#como-funciona" },
+  { label: "Perguntas", href: "#perguntas" },
+];
 
 const PublicNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [search, setSearch] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (search.trim()) {
-      navigate(`/?search=${encodeURIComponent(search.trim())}`);
-      setIsMenuOpen(false);
+  const handleAnchorClick = (e, href) => {
+    setIsMenuOpen(false);
+    if (location.pathname !== "/") {
+      e.preventDefault();
+      navigate("/");
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     }
   };
 
-  const NavLink = ({ to, icon: Icon, children, mobile = false }) => {
-    const active = location.pathname === to;
-    return (
-      <Link
-        to={to}
-        onClick={() => mobile && setIsMenuOpen(false)}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all font-bold text-sm border ${
-          active 
-            ? "bg-white text-slate-900 border-white shadow-lg" 
-            : "bg-slate-800/40 text-slate-400 border-white/5 hover:bg-slate-800 hover:text-white"
-        } ${mobile ? "w-full py-4" : ""}`}
-      >
-        <Icon size={18} />
-        {children}
-      </Link>
-    );
+  const handleLoginClick = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleCTAClick = (e) => {
+    handleAnchorClick(e, "#planos");
   };
 
   return (
     <nav className="bg-slate-950/80 border-b border-white/5 sticky top-0 z-50 backdrop-blur-xl">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-20 gap-8">
-          {/* Logo */}
+        <div className="flex items-center justify-between h-20 gap-6">
           <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <div className="bg-primary-600 p-2 rounded-xl shadow-lg shadow-primary-900/20 group-hover:scale-110 transition-transform duration-300">
+            <div className="bg-gradient-primary p-2 rounded-xl shadow-lg shadow-primary-900/30 group-hover:scale-110 transition-transform duration-300">
               <Play
                 fill="currentColor"
                 size={24}
@@ -48,73 +48,81 @@ const PublicNavbar = () => {
               />
             </div>
             <span className="text-2xl font-black tracking-tighter text-white">
-              67<span className="text-primary-500">videos</span>
+              67<span className="text-primary-400">VIDEOS</span>
             </span>
           </Link>
 
-          {/* Search Bar - Desktop */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden lg:flex relative flex-1 max-w-xl group"
-          >
-            <input
-              type="text"
-              placeholder="Pesquise por títulos, categorias ou tags..."
-              className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-3 px-12 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:bg-slate-900 transition-all placeholder:text-slate-500 font-bold text-white group-hover:border-white/20"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Search
-              className="absolute left-4 top-3.5 text-slate-500 group-focus-within:text-primary-500 transition-colors"
-              size={20}
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-4 top-3.5 text-slate-500 hover:text-white"
+          <div className="hidden lg:flex items-center gap-1">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
+                className="px-4 py-2 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all"
               >
-                <X size={18} />
-              </button>
-            )}
-          </form>
-
-          {/* Right Section */}
-          <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2 mr-2">
-              <NavLink to="/favorites" icon={Heart}>Favoritos</NavLink>
-              <NavLink to="/history" icon={History}>Histórico</NavLink>
-            </div>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
+                {link.label}
+              </a>
+            ))}
           </div>
+
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleLoginClick}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all"
+            >
+              <LogIn size={18} />
+              Entrar
+            </button>
+            <a
+              href="#planos"
+              onClick={(e) => handleCTAClick(e)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white bg-gradient-primary hover:opacity-95 shadow-lg shadow-primary-900/30 hover:shadow-xl hover:shadow-primary-900/40 transition-all active:scale-95"
+            >
+              <Zap size={18} fill="currentColor" />
+              Quero ter acesso
+            </a>
+          </div>
+
+          <button
+            className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
 
-        {/* Mobile Search & Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-6 border-t border-white/5 animate-in slide-in-from-top-4 duration-500 space-y-6">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Pesquisar vídeos..."
-                className="w-full bg-slate-900 border border-white/10 rounded-2xl py-4 px-12 focus:outline-none focus:ring-2 focus:ring-primary-500 text-white font-bold"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Search
-                className="absolute left-4 top-4.5 text-slate-500"
-                size={20}
-              />
-            </form>
-            <div className="flex flex-col gap-3">
-              <NavLink to="/favorites" icon={Heart} mobile>Favoritos</NavLink>
-              <NavLink to="/history" icon={History} mobile>Histórico</NavLink>
+            <div className="flex flex-col gap-2">
+              {NAV_LINKS.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleAnchorClick(e, link.href)}
+                  className="px-5 py-4 rounded-xl font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-all border border-white/5"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+            <div className="flex flex-col gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleLoginClick}
+                className="flex items-center justify-center gap-2 w-full px-5 py-4 rounded-xl font-bold text-slate-300 border border-white/10 hover:bg-white/5 transition-all"
+              >
+                <LogIn size={18} />
+                Entrar
+              </button>
+              <a
+                href="#planos"
+                onClick={(e) => handleCTAClick(e)}
+                className="flex items-center justify-center gap-2 w-full px-5 py-4 rounded-xl font-black text-white bg-gradient-primary shadow-lg shadow-primary-900/30 active:scale-95 transition-all"
+              >
+                <Zap size={18} fill="currentColor" />
+                Quero ter acesso
+              </a>
             </div>
           </div>
         )}
